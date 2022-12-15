@@ -33,19 +33,36 @@ public class UsuarioController {
     @GetMapping("/cadastrar")
     public ModelAndView cadastrar() {
         var modelAndView = new ModelAndView("admin/usuario/cadastro-form");
-        modelAndView.addObject("usuario", new UsuarioCadastroForm());
+        modelAndView.addObject("cadastroForm", new UsuarioCadastroForm());
         return modelAndView;
     }
 
     @PostMapping("/cadastrar")
-    public String cadastrar(@Valid @ModelAttribute("cadastroForm") UsuarioCadastroForm cadastroForm, BindingResult result, RedirectAttributes attr) {
+    public String cadastrar(@Valid @ModelAttribute("cadastroForm") UsuarioCadastroForm cadastroForm, BindingResult result, RedirectAttributes attrs) {
         if (result.hasErrors()) {
             return "admin/usuario/cadastro-form";
         }
         service.cadastrar(cadastroForm);
-        attr.addFlashAttribute("alert", new FlashMessage("alert-success","Usuário cadastrado com sucesso!"));
+        attrs.addFlashAttribute("alert", new FlashMessage("alert-success","Usuário cadastrado com sucesso!"));
         return "redirect:/admin/usuarios";
 
+    }
+
+    @GetMapping("{id}/editar")
+    public ModelAndView editar(@PathVariable Long id) {
+        var modelAndView = new ModelAndView("admin/usuario/cadastro-form");
+        modelAndView.addObject("cadastroForm", service.buscarPorId(id));
+        return modelAndView;
+    }
+
+    @PostMapping("{id}/editar")
+    public String editar(@PathVariable Long id, @Valid @ModelAttribute("cadastroForm") UsuarioCadastroForm cadastroForm, BindingResult result, RedirectAttributes attrs) {
+        if (result.hasErrors()) {
+            return "admin/usuario/cadastro-form";
+        }
+        service.editar(id, cadastroForm);
+        attrs.addFlashAttribute("alert", new FlashMessage("alert-success","Usuário editado com sucesso!"));
+        return "redirect:/admin/usuarios";
     }
 
     @GetMapping("{id}/excluir")

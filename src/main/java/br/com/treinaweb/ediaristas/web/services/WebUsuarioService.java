@@ -26,9 +26,7 @@ public class WebUsuarioService {
 
     public Usuario cadastrar(UsuarioCadastroForm form){
         var model = mapper.toModel(form);
-
         model.setTipoUsuario(TipoUsuario.ADMIN);
-
         return repository.save(model);
     }
 
@@ -36,6 +34,14 @@ public class WebUsuarioService {
         var mensagem = String.format("Usuário com ID %d não encontrado", id);
         return repository.findById(id).orElseThrow(
             () -> new UsuarioNaoEncontradoException(mensagem));
+    }
+
+    public Usuario editar(Long id, UsuarioCadastroForm form) {
+        var usuarioEncontrado = buscarPorId(id);
+        var model = mapper.toModel(form);
+        model.setId(usuarioEncontrado.getId());
+        model.setTipoUsuario(usuarioEncontrado.getTipoUsuario());
+        return repository.save(model);
     }
 
     public void excluirPorId(Long id) {
