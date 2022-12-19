@@ -50,20 +50,11 @@ public class UsuarioController {
 
     @GetMapping("{id}/editar")
     public ModelAndView editar(@PathVariable Long id) {
-        var modelAndView = new ModelAndView("admin/usuario/cadastro-form");
-        modelAndView.addObject("cadastroForm", service.buscarPorId(id));
+        var modelAndView = new ModelAndView("admin/usuario/edicao-form");
+        modelAndView.addObject("edicaoForm", service.buscarFormPorId(id));
         return modelAndView;
     }
 
-    @PostMapping("{id}/editar")
-    public String editar(@PathVariable Long id, @Valid @ModelAttribute("cadastroForm") UsuarioCadastroForm cadastroForm, BindingResult result, RedirectAttributes attrs) {
-        if (result.hasErrors()) {
-            return "admin/usuario/cadastro-form";
-        }
-        service.editar(id, cadastroForm);
-        attrs.addFlashAttribute("alert", new FlashMessage("alert-success","Usuário editado com sucesso!"));
-        return "redirect:/admin/usuarios";
-    }
 
     @GetMapping("{id}/excluir")
     public String excluir(@PathVariable Long id, RedirectAttributes attr) {
