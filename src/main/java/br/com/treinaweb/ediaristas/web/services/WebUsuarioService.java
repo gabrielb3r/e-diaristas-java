@@ -42,6 +42,15 @@ public class WebUsuarioService {
         return mapper.toForm(usuario);
     }
 
+    public Usuario editar(UsuarioEdicaoForm form, Long id){
+        var usuario = buscarPorId(id);
+        var model = mapper.toModel(form);
+        model.setId(usuario.getId());
+        model.setTipoUsuario(usuario.getTipoUsuario());
+        model.setSenha(usuario.getSenha());
+        return repository.save(model);
+    }
+
     public void excluirPorId(Long id) {
         repository.deleteById(id);
     }

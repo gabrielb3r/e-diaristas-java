@@ -13,6 +13,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import br.com.treinaweb.ediaristas.web.dtos.FlashMessage;
 import br.com.treinaweb.ediaristas.web.dtos.UsuarioCadastroForm;
+import br.com.treinaweb.ediaristas.web.dtos.UsuarioEdicaoForm;
 import br.com.treinaweb.ediaristas.web.services.WebUsuarioService;
 import jakarta.validation.Valid;
 
@@ -22,7 +23,7 @@ public class UsuarioController {
 
     @Autowired
     private WebUsuarioService service;
-    
+
     @GetMapping
     public ModelAndView buscarTodos() {
         var modelAndView = new ModelAndView("admin/usuario/lista");
@@ -38,12 +39,13 @@ public class UsuarioController {
     }
 
     @PostMapping("/cadastrar")
-    public String cadastrar(@Valid @ModelAttribute("cadastroForm") UsuarioCadastroForm cadastroForm, BindingResult result, RedirectAttributes attrs) {
+    public String cadastrar(@Valid @ModelAttribute("cadastroForm") UsuarioCadastroForm cadastroForm,
+            BindingResult result, RedirectAttributes attrs) {
         if (result.hasErrors()) {
             return "admin/usuario/cadastro-form";
         }
         service.cadastrar(cadastroForm);
-        attrs.addFlashAttribute("alert", new FlashMessage("alert-success","Usuário cadastrado com sucesso!"));
+        attrs.addFlashAttribute("alert", new FlashMessage("alert-success", "Usuário cadastrado com sucesso!"));
         return "redirect:/admin/usuarios";
 
     }
@@ -55,11 +57,21 @@ public class UsuarioController {
         return modelAndView;
     }
 
+    @PostMapping("/{id}/editar")
+    public String editar(@PathVariable Long id, @Valid @ModelAttribute("edicaoForm") UsuarioEdicaoForm edicaoForm,
+            BindingResult result, RedirectAttributes attrs) {
+        if (result.hasErrors()) {
+            return "admin/usuario/edicao-form";
+        }
+        service.editar(edicaoForm, id);
+        attrs.addFlashAttribute("alert", new FlashMessage("alert-success", "Usuário atualizado com sucesso!"));
+        return "redirect:/admin/usuarios";
+    }
 
     @GetMapping("{id}/excluir")
     public String excluir(@PathVariable Long id, RedirectAttributes attr) {
         service.excluirPorId(id);
-        attr.addFlashAttribute("alert", new FlashMessage("alert-success","Usuário excluído com sucesso!"));
+        attr.addFlashAttribute("alert", new FlashMessage("alert-success", "Usuário excluído com sucesso!"));
         return "redirect:/admin/usuarios";
     }
 }

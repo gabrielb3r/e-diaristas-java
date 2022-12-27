@@ -50,8 +50,7 @@ public class ServicoController {
 
     @GetMapping("/{id}/editar")
     public ModelAndView editar(@PathVariable Long id){
-        var modelAndView = new ModelAndView("admin/servico/form");
-      
+        var modelAndView = new ModelAndView("admin/servico/form");      
         modelAndView.addObject("form", service.buscarPorId(id));
         return modelAndView;
     }
