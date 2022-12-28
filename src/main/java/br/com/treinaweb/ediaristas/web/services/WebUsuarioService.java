@@ -8,6 +8,7 @@ import org.springframework.validation.FieldError;
 
 import br.com.treinaweb.ediaristas.core.enums.TipoUsuario;
 import br.com.treinaweb.ediaristas.core.exceptions.SenhasNaoConferemException;
+import br.com.treinaweb.ediaristas.core.exceptions.UsuarioJaCadastradoException;
 import br.com.treinaweb.ediaristas.core.exceptions.UsuarioNaoEncontradoException;
 import br.com.treinaweb.ediaristas.core.models.Usuario;
 import br.com.treinaweb.ediaristas.core.repositories.UsuarioRepository;
@@ -35,8 +36,12 @@ public class WebUsuarioService {
             var fieldError = new FieldError(form.getClass().getName(), "confirmacaoSenha", form.getConfirmacaoSenha(), false, null, null, mensagem);
             throw new SenhasNaoConferemException(mensagem, fieldError);
         }
+
         var model = mapper.toModel(form);
         model.setTipoUsuario(TipoUsuario.ADMIN);
+
+        validarCamposUnicos(model);
+        
         return repository.save(model);
     }
 
@@ -53,14 +58,28 @@ public class WebUsuarioService {
 
     public Usuario editar(UsuarioEdicaoForm form, Long id){
         var usuario = buscarPorId(id);
+        
         var model = mapper.toModel(form);
         model.setId(usuario.getId());
         model.setTipoUsuario(usuario.getTipoUsuario());
         model.setSenha(usuario.getSenha());
+       
+        validarCamposUnicos(model);
+       
         return repository.save(model);
     }
 
     public void excluirPorId(Long id) {
         repository.deleteById(id);
+    }
+
+    private void validarCamposUnicos(Usuario usuario){
+        repository.findByEmail(usuario.getEmail()).ifPresent((usuarioEncontrado)->{
+            if (usuarioEncontrado.getId() != usuario.getId()) {
+                var mensagem = "Já existe um usuário cadastrado com o e-mail informado";
+                var fieldError = new FieldError(usuario.getClass().getName(), "email", usuario.getEmail(), false, null, null, mensagem);
+                throw new UsuarioJaCadastradoException(mensagem, fieldError);
+            }
+        });
     }
 }
